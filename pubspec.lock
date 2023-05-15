@@ -9,14 +9,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
-  big_decimal:
-    dependency: transitive
-    description:
-      name: big_decimal
-      sha256: "301158ec5a646d1e1a0ca7a97fbfab7be18a8df700adb7f7cb9c4149e75c8f0c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.0"
   characters:
     dependency: transitive
     description:
@@ -139,14 +131,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
-  transit_dart:
-    dependency: "direct main"
-    description:
-      name: transit_dart
-      sha256: e920079d698f177b53aa2301b0e6ca696b08f1f39128699dadd21ee033d824e2
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.8.90"
   typed_data:
     dependency: transitive
     description:

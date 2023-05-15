@@ -4,7 +4,7 @@
  :aliases {:cljd {:main-opts ["-m" "cljd.build"]
                   :extra-deps {tensegritics/clojuredart
                                {:git/url "https://github.com/tensegritics/ClojureDart.git"
-                                :sha "8d5916c0dc87146dc2e8921aaa7fd5dc3c6c3401"}
+                                :sha "9a6ecd8f347a5d85836ca27d3c57b1cb05ded5a4" #_"8d5916c0dc87146dc2e8921aaa7fd5dc3c6c3401"}
                                io.github.wevre/transit-cljd {:git/tag "v0.8.18" :git/sha "23812d9"}}}
 
            :clj {:extra-deps {org.clojure/clojure {:mvn/version "1.11.1"}

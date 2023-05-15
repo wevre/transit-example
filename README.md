@@ -17,4 +17,13 @@ the `wevre.transit-cljd` namespace under the `src` directory, and reference to
 
 Next step is to remove the manual copy of `wevre.transit-cljd` under the `src`
 directory and pick it up instead with a reference in `deps.edn`. This is the
-version tagged `cljd-deps`.
+version tagged `cljd-deps`. That works. Good.
+
+Now we want to remove `transit_dart` from `pubspec.yaml`, with the expectation
+that it will get picked up as a transitive dependency by the ClojureDart
+compiler. Baptiste Dupuche has created a version of ClojureDart that is meant to
+do this: include transitive dependencies for Dart packages that are found in
+ClojureDart libraries. This version is tagged with `remove-transit_dart`. I
+can't get this version to work, when attempting to compile namespace
+`wevre.transit-cljd` (which comes from the `transit-cljd` library) there is an
+error about not finding 'package:transit_dart/transit_dart.dart'.
