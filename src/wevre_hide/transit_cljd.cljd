@@ -1,4 +1,4 @@
-(ns wevre.transit-cljd
+(ns wevre-hide.transit-cljd
   "An implementation of the transit-format for ClojureDart build on top of the
    transit_dart Dart package."
   (:require [cljd.core :as cljd]
