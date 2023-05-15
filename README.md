@@ -27,3 +27,25 @@ ClojureDart libraries. This version is tagged with `remove-transit_dart`. I
 can't get this version to work, when attempting to compile namespace
 `wevre.transit-cljd` (which comes from the `transit-cljd` library) there is an
 error about not finding 'package:transit_dart/transit_dart.dart'.
+
+## Usage
+
+This project is a combination of a ClojureDart+Flutter frontend, and a Clojure
+backend running a Jetty server to receive transit requests and serve back
+transit responses. There is very little error checking, and by 'very little' I
+mean 'none'. The front-end is a simple form with two fields. You type in two
+numbers and hit the button. The values of the fields are sent as a map to the
+server, which adds them together, and provides a response string of the
+summation. I know, very sophisticated.
+
+To get the backend server up and running, start a Clojure repl with the `clj`
+alias, load/evaluate the `adapter` namespace, and execute the `go` function. You
+can stop the server with the `halt!` function. I'm using VS Code and Calva, so I
+simply jack-in and run things from the editor. But from the command-line, one
+could do:
+
+```
+clj -M:clj
+user=> (require '[adapter])
+user=> (adapter/go)
+```

@@ -1,7 +1,7 @@
 (ns adapter
   (:require [cognitect.transit :as transit]
             [ring.adapter.jetty :as jetty])
-  (:import (java.io ByteArrayOutputStream ByteArrayInputStream)))
+  (:import (java.io ByteArrayOutputStream)))
 
 (defn handler [request]
   ;; decode body of request as transit data,
