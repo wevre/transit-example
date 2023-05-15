@@ -1,19 +1,61 @@
 (ns acme.main
   (:require ["package:flutter/material.dart" :as m]
-            [cljd.flutter :as f]))
+            ["package:http/http.dart" :as http]
+            [cljd.flutter :as f]
+            [wevre.transit-cljd :as transit]))
+
+(defonce result (atom ""))
+
+(defonce codec (transit/json))
+
+(defn parse-d [str]
+  (try
+    (double/parse str)
+    (catch Object _ nil)))
 
 (defn main []
   (f/run
-    (m/MaterialApp
-      .title "Welcome to Flutter"
-      .theme (m/ThemeData .primarySwatch m.Colors/pink))
-    .home
-    (m/Scaffold
-      .appBar (m/AppBar
-                .title (m/Text "Welcome to ClojureDart")))
-    .body
-    m/Center
-    (m/Text "Let's get coding!"
-       .style (m/TextStyle
-                .color m.Colors/red
-                .fontSize 32.0))))
+   (m/MaterialApp
+    .title "Welcome to Flutter"
+    .theme (m/ThemeData .primarySwatch m.Colors/pink))
+   .home
+   (m/Scaffold .appBar (m/AppBar .title (m/Text "Welcome to ClojureDart")))
+   .body
+   (m/Padding .padding (m/EdgeInsets.all 16.0))
+   :managed [tc1 (m/TextEditingController)
+             tc2 (m/TextEditingController)]
+   (m/Column .crossAxisAlignment m/CrossAxisAlignment.start)
+   .children
+   [(m/Padding .padding (m/EdgeInsets.symmetric .horizontal 8 .vertical 16)
+               .child
+               (m/TextField .controller tc1
+                            .decoration
+                            (m/InputDecoration .border (m/OutlineInputBorder)
+                                               .hintText "First number")))
+    (m/Padding .padding (m/EdgeInsets.symmetric .horizontal 8 .vertical 16)
+               .child
+               (m/TextField .controller tc2
+                            .decoration
+                            (m/InputDecoration .border (m/OutlineInputBorder)
+                                               .hintText "Second number")))
+    (m/Padding .padding (m/EdgeInsets.symmetric .horizontal 8 .vertical 16)
+               .child
+               (f/widget
+                :watch [msg (f/$ (f/<! result))]
+                (m/Row)
+                .children
+                [(m/ElevatedButton
+                  .onPressed
+                  (fn []
+                    (let [payload (await (.convert (.-encoder codec) {:num1 (parse-d (.-text tc1))
+                                                                      :num2 (parse-d (.-text tc2))}))
+                          response (await (http/post (Uri/parse "http://localhost:8860")
+                                                     .headers {"Content-Type" "application/json+transit"}
+                                                     .body payload))
+                          decoder (.-decoder codec)
+                          body (await (.convert decoder (.-body response)))]
+                      (reset! result (:result body)))
+                    nil)
+                  .child (m/Text "Add numbers"))
+                 (m/SizedBox .width 8.0)
+                 (m/Text (str "Result: " msg))]))]))

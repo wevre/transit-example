@@ -1,0 +1,135 @@
+(ns wevre.transit-cljd
+  "An implementation of the transit-format for ClojureDart build on top of the
+   transit_dart Dart package."
+  (:require [cljd.core :as cljd]
+            ["package:transit_dart/transit_dart.dart" :as transit]))
+
+;; Writing
+
+(def default-write-handlers
+  "docstring"
+  {cljd/Keyword (let [to-str (fn [s] (.substring (str s) 1))]
+                  (reify :extends #/(transit/WriteHandler cljd/Keyword dynamic)
+                    (tag [_ _o] ":")
+                    (rep [_ o .tag] (to-str o))
+                    (stringRep [_ o] (to-str o))))
+
+   cljd/Symbol (reify :extends #/(transit/WriteHandler cljd/Symbol dynamic)
+                 (tag [_ _o] "$")
+                 (rep [_ o .tag] (str o))
+                 (stringRep [_ o] (str o)))})
+
+;; Reading
+
+(defn read-handler
+  "Creates a transit ReadHandler whose fromRep method invokes the provided fn."
+  [from-rep]
+  (reify transit/ReadHandler (fromRep [_ o] (from-rep o))))
+
+(def default-read-handlers
+  "docstring"
+  {":" (read-handler keyword)
+   "$" (read-handler symbol)
+
+   "set"
+   (reify transit/ArrayReadHandler
+     (fromRep [_ _o])
+     (arrayBuilder [_]
+       (reify
+         :extends #/(transit/ArrayBuilder cljd/PersistentHashSet cljd/PersistentHashSet dynamic)
+         (init [_] #{})
+         (add [_ s i] (conj s i))
+         (complete [_ s] s))
+       #_(reify
+           :extends #/(transit/ArrayBuilder cljd/TransientHashSet cljd/PersistentHashSet dynamic)
+           (init [_] (transient #{}))
+           (add [_ s i] (conj! s i))
+           (complete [_ s] (persistent! s)))))
+
+   "cmap"
+   (reify transit/ArrayReadHandler
+     (fromRep [_ _o])
+     (arrayBuilder [_]
+       (let [marker ^:unique (Object)
+             next-key (List/from [marker])]
+         (reify
+           :extends #/(transit/ArrayBuilder cljd/TransientHashMap cljd/PersistentHashMap dynamic)
+           (init [_] (transient {}))
+           (add [_ m i]
+             (let [k (aget next-key 0)]
+               (if (identical? k marker)
+                 (do
+                   (aset next-key 0 i)
+                   m)
+                 (do
+                   (aset next-key 0 marker)
+                   (assoc! m k i)))))
+           (complete [_ m] (persistent! m))))))})
+
+;; Builders
+
+(def map-builder
+  "docstring"
+  (reify
+    :extends #/(transit/MapBuilder cljd/TransientHashMap cljd/PersistentHashMap dynamic dynamic)
+    (init [_] (transient {}))
+    (add [_ m k v] (assoc! m k v))
+    (complete [_ m] (persistent! m))))
+
+(def array-builder
+  "docstring"
+  (reify
+    :extends #/(transit/ArrayBuilder cljd/TransientVector cljd/PersistentVector dynamic)
+    (init [_] (transient []))
+    (add [_ v i] (conj! v i))
+    (complete [_ v] (persistent! v))))
+
+;; Codecs
+
+(defn ^transit/TransitJsonCodec json
+  "docstring"
+  [& {:keys [custom-read-handlers
+             custom-write-handlers
+             map-builder
+             array-builder]
+      :or {custom-read-handlers default-read-handlers
+           custom-write-handlers default-write-handlers
+           map-builder map-builder
+           array-builder array-builder}}]
+  (transit/TransitJsonCodec
+   .customReadHandlers custom-read-handlers
+   .customWriteHandlers custom-write-handlers
+   .mapBuilder map-builder
+   .arrayBuilder array-builder))
+
+(defn ^transit/TransitJsonVerboseCodec json-verbose
+  "docstring"
+  [& {:keys [custom-read-handlers
+             custom-write-handlers
+             map-builder
+             array-builder]
+      :or {custom-read-handlers default-read-handlers
+           custom-write-handlers default-write-handlers
+           map-builder map-builder
+           array-builder array-builder}}]
+  (transit/TransitJsonVerboseCodec
+   .customReadHandlers custom-read-handlers
+   .customWriteHandlers custom-write-handlers
+   .mapBuilder map-builder
+   .arrayBuilder array-builder))
+
+(defn ^transit/TransitMessagePackCodec msgpack
+  "docstring"
+  [& {:keys [custom-read-handlers
+             custom-write-handlers
+             map-builder
+             array-builder]
+      :or {custom-read-handlers default-read-handlers
+           custom-write-handlers default-write-handlers
+           map-builder map-builder
+           array-builder array-builder}}]
+  (transit/TransitMessagePackCodec
+   .customReadHandlers custom-read-handlers
+   .customWriteHandlers custom-write-handlers
+   .mapBuilder map-builder
+   .arrayBuilder array-builder))
