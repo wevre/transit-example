@@ -1,4 +1,4 @@
-# cljd_transit_example
+# Transit Example
 
 A project to test out transitive dependencies in ClojureDart. Specifically, I
 have a ClojureDart library,
@@ -27,6 +27,13 @@ ClojureDart libraries. This version is tagged with `remove-transit_dart`. I
 can't get this version to work, when attempting to compile namespace
 `wevre.transit-cljd` (which comes from the `transit-cljd` library) there is an
 error about not finding 'package:transit_dart/transit_dart.dart'.
+
+I checked with Baptiste and I need to use the version he created of ClojureDart,
+the version that pulls in dependencies, I need to use that version in _both_
+this sample project, _and_ in the `transit-cljd` project. I don't think that
+will be expected in the future, but for now, since this is all a work in
+progress, it is needed. There is a new tag of this project, `same-hash`, where
+everyone is now using the same version of ClojureDart.
 
 ## Usage
 
