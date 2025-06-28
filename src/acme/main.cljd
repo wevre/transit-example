@@ -8,11 +8,6 @@
 
 (defonce codec (transit/json))
 
-(defn parse-d [str]
-  (try
-    (double/parse str)
-    (catch Object _ nil)))
-
 (defn main []
   (f/run
    (m/MaterialApp
@@ -47,8 +42,9 @@
                 [(m/ElevatedButton
                   .onPressed
                   (fn []
-                    (let [payload (await (.convert (.-encoder codec) {:num1 (parse-d (.-text tc1))
-                                                                      :num2 (parse-d (.-text tc2))}))
+                    (let [payload (await
+                                   (.convert (.-encoder codec) {:num1 (parse-double (.-text tc1))
+                                                                :num2 (parse-double (.-text tc2))}))
                           response (await (http/post (Uri/parse "http://localhost:8860")
                                                      .headers {"Content-Type" "application/json+transit"}
                                                      .body payload))
