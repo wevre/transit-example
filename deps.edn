@@ -2,8 +2,7 @@
  :deps {tensegritics/clojuredart
         {:git/url "https://github.com/tensegritics/ClojureDart.git"
          :sha "9385be3c88ab6593350fdda50d86af985224971b"}
-        io.github.wevre/transit-cljd
-        {:git/tag "v0.8.32" :git/sha "504b91b"}}
+        io.github.wevre/transit-cljd {:git/tag "v0.8.36" :git/sha "d9541d0"}}
  :aliases {:cljd {:main-opts ["-m" "cljd.build"]}
            :clj {:extra-deps {org.clojure/clojure {:mvn/version "1.12.0"}
                               ring/ring-core {:mvn/version "1.9.6"}
